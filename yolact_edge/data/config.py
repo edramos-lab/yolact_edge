@@ -174,11 +174,11 @@ dataset_base = Config({
 strawberry_dataset = dataset_base.copy({
     'name': 'Strawberry_Dataset',
 
-    'train_images': './Strawberry-segmentation-1/train/',
-    'train_info':   './Strawberry-segmentation-1/train/_annotations.coco.json',
+    'train_images': '../Strawberry-segmentation-1/train/',
+    'train_info':   '../Strawberry-segmentation-1/train/_annotations.coco.json',
 
-    'valid_images': './Strawberry-segmentation-1/valid/',
-    'valid_info':   './Strawberry-segmentation-1/valid/_annotations.coco.json',
+    'valid_images': '../Strawberry-segmentation-1/valid/',
+    'valid_info':   '../Strawberry-segmentation-1/valid/_annotations.coco.json',
 
     'has_gt': True,
     'class_names': ('Angular Leafspot', 'Anthracnose Fruit Rot', 'Healthy Strawberry', 'Blossom Blight','Gray Mold', 'Leaf Spot', 'Powdery Mildew Fruit', 'Powdery Mildew Leaf')
@@ -189,11 +189,11 @@ strawberry_dataset = dataset_base.copy({
 strawberry_dataset_synthetic = dataset_base.copy({
     'name': 'Strawberry_Dataset',
 
-    'train_images': './Strawberry-segmentation-synthetic/train/',
-    'train_info':   './Strawberry-segmentation-synthetic/train/_annotations.coco.json',
+    'train_images': '../Strawberry-segmentation-synthetic/train/',
+    'train_info':   '../Strawberry-segmentation-synthetic/train/_annotations.coco.json',
 
-    'valid_images': './Strawberry-segmentation-synthetic/valid/',
-    'valid_info':   './Strawberry-segmentation-synthetic/valid/_annotations.coco.json',
+    'valid_images': '../Strawberry-segmentation-synthetic/valid/',
+    'valid_info':   '../Strawberry-segmentation-synthetic/valid/_annotations.coco.json',
 
     'has_gt': True,
     'class_names': ('Angular Leafspot', 'Anthracnose Fruit Rot', 'Blossom Blight','Gray Mold','Healthy Strawberry', 'Leaf Spot', 'Powdery Mildew Fruit', 'Powdery Mildew Leaf')
@@ -204,11 +204,11 @@ strawberry_dataset_synthetic = dataset_base.copy({
 strawberry_dataset_afzaal = dataset_base.copy({
     'name': 'Strawberry_Dataset',
 
-    'train_images': './Strawberry-segmentation-Afzaal/train/',
-    'train_info':   './Strawberry-segmentation-Afzaal/train/_annotations.coco.json',
+    'train_images': '../Strawberry-segmentation-Afzaal/train/',
+    'train_info':   '../Strawberry-segmentation-Afzaal/train/_annotations.coco.json',
 
-    'valid_images': './Strawberry-segmentation-Afzaal/valid/',
-    'valid_info':   './Strawberry-segmentation-Afzaal/valid/_annotations.coco.json',
+    'valid_images': '../Strawberry-segmentation-Afzaal/valid/',
+    'valid_info':   '../Strawberry-segmentation-Afzaal/valid/_annotations.coco.json',
 
     'has_gt': True,
     'class_names': ('Angular Leafspot', 'Anthracnose Fruit Rot', 'Blossom Blight','Gray Mold', 'Leaf Spot', 'Powdery Mildew Fruit', 'Powdery Mildew Leaf')
