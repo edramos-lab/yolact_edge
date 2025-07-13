@@ -1,4 +1,16 @@
-# cython: language_level=3
+# Copy this entire cell and paste it into your Colab notebook after cloning the repository:
+
+import os
+
+def robust_fix_yolact_edge():
+    """Robust fix that completely rewrites the problematic files."""
+    
+    print("🔧 Applying robust fixes to yolact_edge...")
+    
+    # Fix 1: Completely rewrite the Cython file
+    cython_file = "yolact_edge/utils/cython_nms.pyx"
+    if os.path.exists(cython_file):
+        fixed_cython_content = '''# cython: language_level=3
 ## Note: Figure out the license details later.
 #
 # Based on:
@@ -33,7 +45,7 @@ def nms(np.ndarray[np.float32_t, ndim=2] dets, np.float32_t thresh):
     cdef np.ndarray[np.int64_t, ndim=1] order = scores.argsort()[::-1]
 
     cdef int ndets = dets.shape[0]
-    cdef np.ndarray[np.int32_t, ndim=1] suppressed = \
+    cdef np.ndarray[np.int32_t, ndim=1] suppressed = \\
             np.zeros((ndets), dtype=np.int32)
 
     # nominal indices
@@ -73,3 +85,32 @@ def nms(np.ndarray[np.float32_t, ndim=2] dets, np.float32_t thresh):
                   suppressed[j] = 1
 
     return np.where(suppressed == 0)[0]
+'''
+        
+        with open(cython_file, 'w') as f:
+            f.write(fixed_cython_content)
+        print("✅ Cython file completely rewritten")
+    
+    # Fix 2: Fix the import in config.py
+    config_file = "yolact_edge/data/config.py"
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            content = f.read()
+        
+        # Replace the import line
+        old_import = "from backbone import ResNetBackbone, VGGBackbone, ResNetBackboneGN, DarkNetBackbone, MobileNetV2Backbone"
+        new_import = "from yolact_edge.backbone import ResNetBackbone, VGGBackbone, ResNetBackboneGN, DarkNetBackbone, MobileNetV2Backbone"
+        
+        if old_import in content:
+            content = content.replace(old_import, new_import)
+            print("✅ Fixed import in config.py")
+        else:
+            print("⚠️ Import line not found or already fixed")
+        
+        with open(config_file, 'w') as f:
+            f.write(content)
+    
+    print("🎉 All robust fixes applied! You can now run the training script.")
+
+# Run the robust fix
+robust_fix_yolact_edge() 

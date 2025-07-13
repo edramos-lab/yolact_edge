@@ -55,7 +55,9 @@ def postprocess(det_output, w, h, batch_idx=0, interpolation_mode='bilinear',
 
     # Undo the padding introduced with preserve_aspect_ratio
     if cfg.preserve_aspect_ratio:
-        r_w, r_h = Resize.faster_rcnn_scale(w, h, cfg.min_size, cfg.max_size)
+        # Use max_size as min_size if min_size is not defined (for backward compatibility)
+        min_size = getattr(cfg, 'min_size', cfg.max_size)
+        r_w, r_h = Resize.faster_rcnn_scale(w, h, min_size, cfg.max_size)
 
         # Get rid of any detections whose centers are outside the image
         boxes = dets['box']
@@ -157,7 +159,9 @@ def undo_image_transformation(img, w, h):
 
     if cfg.preserve_aspect_ratio:
         # Undo padding
-        r_w, r_h = Resize.faster_rcnn_scale(w, h, cfg.min_size, cfg.max_size)
+        # Use max_size as min_size if min_size is not defined (for backward compatibility)
+        min_size = getattr(cfg, 'min_size', cfg.max_size)
+        r_w, r_h = Resize.faster_rcnn_scale(w, h, min_size, cfg.max_size)
         img_numpy = img_numpy[:r_h, :r_w]
 
         # Undo resizing

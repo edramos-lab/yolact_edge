@@ -1,9 +1,14 @@
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
+import sys
+import math
+import numpy as np
+import random  # Use Python's random instead of numpy's
+import types
 from torchvision import transforms
 import cv2
-import numpy as np
-import types
-from numpy import random
 
 from yolact_edge.data import cfg, MEANS, STD
 
@@ -196,7 +201,8 @@ class Resize(object):
 
     def __init__(self, resize_gt=True):
         self.resize_gt = resize_gt
-        self.min_size = cfg.min_size
+        # Use max_size as min_size if min_size is not defined (for backward compatibility)
+        self.min_size = getattr(cfg, 'min_size', cfg.max_size)
         self.max_size = cfg.max_size
         self.preserve_aspect_ratio = cfg.preserve_aspect_ratio
 
@@ -252,7 +258,7 @@ class RandomSaturation(object):
 
     def __call__(self, image, masks=None, boxes=None, labels=None, seeds=None, require_seeds=False):
         if seeds is None:
-            if random.randint(2):
+            if random.randint(0, 1):
                 seeds = random.uniform(self.lower, self.upper)
             else:
                 seeds = 1.0
@@ -271,7 +277,7 @@ class RandomHue(object):
 
     def __call__(self, image, masks=None, boxes=None, labels=None, seeds=None, require_seeds=False):
         if seeds is None:
-            if random.randint(2):
+            if random.randint(0, 1):
                 seeds = random.uniform(-self.delta, self.delta)
             else:
                 seeds = 0
@@ -335,7 +341,7 @@ class RandomContrast(object):
     # expects float image
     def __call__(self, image, masks=None, boxes=None, labels=None, seeds=None, require_seeds=False):
         if seeds is None:
-            if random.randint(2):
+            if random.randint(0, 1):
                 seeds = random.uniform(self.lower, self.upper)
             else:
                 seeds = 1.0
@@ -356,7 +362,7 @@ class RandomBrightness(object):
 
     def __call__(self, image, masks=None, boxes=None, labels=None, seeds=None, require_seeds=False):
         if seeds is None:
-            if random.randint(2):
+            if random.randint(0, 1):
                 seeds = random.uniform(-self.delta, self.delta)
             else:
                 seeds = 0
@@ -394,7 +400,7 @@ class RandomSampleCrop(object):
             labels (Tensor): the class labels for each bbox
     """
     def __init__(self):
-        self.sample_options = (
+        self.sample_options = [
             # using entire original input image
             None,
             # sample a patch s.t. MIN jaccard w/ obj in .1,.3,.4,.7,.9
@@ -404,7 +410,7 @@ class RandomSampleCrop(object):
             (0.9, None),
             # randomly sample a patch
             (None, None),
-        )
+        ]
 
     def __call__(self, image, masks, boxes=None, labels=None, seeds=None, require_seeds=False):
         height, width, _ = image.shape
@@ -445,8 +451,8 @@ class RandomSampleCrop(object):
                     continue
 
                 if seeds is None:
-                    left = random.uniform(width - w)
-                    top = random.uniform(height - h)
+                    left = random.uniform(0, width - w)
+                    top = random.uniform(0, height - h)
                 else:
                     left, top = seeds[3:5]
 
@@ -543,7 +549,7 @@ class Expand(object):
         if seeds is not None:
             random_draw = seeds[0]
         else:
-            random_draw = random.randint(2)
+            random_draw = random.randint(0, 1)
 
         if random_draw:
             if require_seeds:
@@ -594,7 +600,7 @@ class RandomMirror(object):
         if seeds is not None:
             random_draw = seeds[0]
         else:
-            random_draw = random.randint(2)
+            random_draw = random.randint(0, 1)
 
         if random_draw:
             image = image[:, ::-1]
@@ -616,7 +622,7 @@ class RandomFlip(object):
         if seeds is not None:
             random_draw = seeds[0]
         else:
-            random_draw = random.randint(2)
+            random_draw = random.randint(0, 1)
 
         if random_draw:
             image = image[::-1, :]
@@ -637,7 +643,7 @@ class RandomRot90(object):
         if seeds is not None:
             random_draw = seeds[0]
         else:
-            random_draw = random.randint(4)
+            random_draw = random.randint(0, 3)
 
         k = random_draw
         image = np.rot90(image,k)
@@ -697,7 +703,7 @@ class PhotometricDistort(object):
         im = image.copy()
         if seeds is None:
             brightness_seed, (im, masks, boxes, labels) = self.rand_brightness(im, masks, boxes, labels, require_seeds=True)
-            distort_seed_1 = random.randint(2)
+            distort_seed_1 = random.randint(0, 1)
             if distort_seed_1:
                 distort = ComposeVideo(self.pd[:-1])
             else:

@@ -132,7 +132,7 @@ class ResNetBackbone(nn.Module):
     def init_backbone(self, path):
         """ Initializes the backbone weights for training. """
         state_dict = torch.load(path, map_location='cpu')
-
+        
         # Replace layer1 -> layers.0 etc.
         keys = list(state_dict)
         for key in keys:
@@ -140,8 +140,7 @@ class ResNetBackbone(nn.Module):
                 idx = int(key[5])
                 new_key = 'layers.' + str(idx-1) + key[6:]
                 state_dict[new_key] = state_dict.pop(key)
-
-        # Note: Using strict=False is berry scary. Triple check this.
+        
         self.load_state_dict(state_dict, strict=False)
 
     def add_layer(self, conv_channels=1024, downsample=2, depth=1, block=Bottleneck):
@@ -583,8 +582,25 @@ class MobileNetV2Backbone(nn.Module):
         """ Initializes the backbone weights for training. """
         checkpoint = torch.load(path)
 
-        checkpoint.pop('classifier.1.weight')
-        checkpoint.pop('classifier.1.bias')
+        # Try to remove classifier keys if they exist (for pure backbone checkpoints)
+        try:
+            checkpoint.pop('classifier.1.weight')
+            checkpoint.pop('classifier.1.bias')
+        except KeyError:
+            # If classifier keys don't exist, this might be a full model checkpoint
+            # We need to extract only the backbone weights
+            backbone_keys = [k for k in checkpoint.keys() if k.startswith('backbone.')]
+            if backbone_keys:
+                # Extract backbone weights from full model checkpoint
+                backbone_state_dict = {}
+                for k in backbone_keys:
+                    # Remove 'backbone.' prefix
+                    new_key = k.replace('backbone.', '')
+                    backbone_state_dict[new_key] = checkpoint[k]
+                checkpoint = backbone_state_dict
+            else:
+                # If no backbone keys found, assume this is a pure backbone checkpoint
+                pass
 
         checkpoint_keys = list(checkpoint.keys())
         assert len(checkpoint_keys) == len(self.state_dict())
