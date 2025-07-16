@@ -46,7 +46,7 @@ parser.add_argument('--start_iter', default=0, type=int,
                          'determined from the file name.')
 parser.add_argument('--random_seed', default=42, type=int,
                     help='Random seed used across all workers')
-parser.add_argument('--num_workers', default=4, type=int,
+parser.add_argument('--num_workers', default=0, type=int,
                     help='Number of workers used in dataloading')
 parser.add_argument('--num_gpus', default=None, type=int,
                     help='Number of GPUs used in training')
