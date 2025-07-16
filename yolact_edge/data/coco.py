@@ -212,7 +212,17 @@ class COCODetection(data.Dataset):
             print('Warning: Augmentation output an example with no ground truth. Resampling...')
             return self.pull_item(random.randint(0, len(self.ids)-1))
 
-        return torch.from_numpy(img).permute(2, 0, 1), target, masks, height, width, num_crowds
+        # Ensure numpy is available and convert to tensor
+        try:
+            img_tensor = torch.from_numpy(img).permute(2, 0, 1)
+        except RuntimeError as e:
+            if "Numpy is not available" in str(e):
+                # Fallback: convert to list first, then to tensor
+                img_list = img.tolist()
+                img_tensor = torch.tensor(img_list, dtype=torch.float32).permute(2, 0, 1)
+            else:
+                raise e
+        return img_tensor, target, masks, height, width, num_crowds
 
     def pull_image(self, index):
         '''Returns the original image object at index in PIL form
