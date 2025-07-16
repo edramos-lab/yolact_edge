@@ -196,7 +196,7 @@ strawberry_dataset_synthetic = dataset_base.copy({
     'valid_info':   '../Strawberry-segmentation-synthetic/valid/_annotations.coco.json',
 
     'has_gt': True,
-    'class_names': ('Angular Leafspot', 'Anthracnose Fruit Rot', 'Blossom Blight','Gray Mold','Healthy Strawberry', 'Leaf Spot', 'Powdery Mildew Fruit', 'Powdery Mildew Leaf')
+    'class_names': ('background', 'Angular Leafspot', 'Anthracnose Fruit Rot', 'Blossom Blight','Gray Mold','Healthy Strawberry', 'Leaf Spot', 'Powdery Mildew Fruit', 'Powdery Mildew Leaf')
 })
 
 # Dataset de original de Afzaal 
@@ -204,11 +204,11 @@ strawberry_dataset_synthetic = dataset_base.copy({
 strawberry_dataset_afzaal = dataset_base.copy({
     'name': 'Strawberry_Dataset',
 
-    'train_images': '../Strawberry-segmentation-Afzaal/train/',
-    'train_info':   '../Strawberry-segmentation-Afzaal/train/_annotations.coco.json',
+    'train_images': './Strawberry-segmentation-Afzaal/train/',
+    'train_info':   './Strawberry-segmentation-Afzaal/train/_annotations.coco.json',
 
-    'valid_images': '../Strawberry-segmentation-Afzaal/valid/',
-    'valid_info':   '../Strawberry-segmentation-Afzaal/valid/_annotations.coco.json',
+    'valid_images': './Strawberry-segmentation-Afzaal/valid/',
+    'valid_info':   './Strawberry-segmentation-Afzaal/valid/_annotations.coco.json',
 
     'has_gt': True,
     'class_names': ('Angular Leafspot', 'Anthracnose Fruit Rot', 'Blossom Blight','Gray Mold', 'Leaf Spot', 'Powdery Mildew Fruit', 'Powdery Mildew Leaf')
@@ -366,7 +366,7 @@ resnet152_backbone = resnet101_backbone.copy({
 
 resnet50_backbone = resnet101_backbone.copy({
     'name': 'ResNet50',
-    'path': 'resnet50-19c8e357-fixed.pth',
+    'path': 'resnet50-19c8e357.pth',
     'type': ResNetBackbone,
     'args': ([3, 4, 6, 3],),
     'transform': resnet_transform,
@@ -770,16 +770,16 @@ yolact_base_config = coco_base_config.copy({
     'name': 'yolact_base',
 
     # Dataset stuff
-    'dataset': coco2017_dataset,
-    'num_classes': len(coco2017_dataset.class_names) + 1,
+    'dataset': strawberry_dataset_synthetic,
+    'num_classes': 9, #len(coco2017_dataset.class_names) + 1,
 
     # Image Size
-    'max_size': 550,
+    'max_size': 416,#550,
     
     # Training params
     'lr_schedule': 'step',
-    'lr_steps': (280000, 600000, 700000, 750000),
-    'max_iter': 800000,
+    'lr_steps': (28000, 60000, 70000, 75000),
+    'max_iter': 80000,
 
     'flow': flow_base,
     
@@ -950,6 +950,21 @@ yolact_resnet50_config = yolact_base_config.copy({
         'use_square_anchors': True, # This is for backward compatability with a bug
     }),
 })
+
+yolact_resnet101_config = yolact_base_config.copy({
+    'name': 'yolact_resnet101',
+
+    'backbone': resnet101_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+
+        'pred_scales': yolact_base_config.backbone.pred_scales,
+        'pred_aspect_ratios': yolact_base_config.backbone.pred_aspect_ratios,
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': True, # This is for backward compatability with a bug
+    }),
+})
+
 
 yolact_resnet152_config = yolact_base_config.copy({
     'name': 'yolact_resnet152',
