@@ -778,8 +778,8 @@ yolact_base_config = coco_base_config.copy({
     
     # Training params
     'lr_schedule': 'step',
-    'lr_steps': (28000, 60000, 70000, 75000),
-    'max_iter': 80000,
+    'lr_steps': (10000,15000 , 20000, 25000),
+    'max_iter': 30000,
 
     'flow': flow_base,
     
